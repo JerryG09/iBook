@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 
 const User = require('../models/user');
 
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
       api_key:
-        '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'
+        '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'
     }
   })
 );
@@ -145,20 +145,20 @@ exports.postSignup = (req, res, next) => {
     .hash(password, 12)
     .then(hashedPassword => {
       const user = new User({
-        email: email,
+        email: email, 
         password: hashedPassword,
         cart: { items: [] }
       });
       return user.save();
     })
     .then(result => {
+      transporter.sendMail({
+        to: email,
+        from: 'ibook@jerrycodes.com',
+        subject: 'Signup successfully',
+        html: '<h1>You signed up successfully!</h1>'
+      })
       res.redirect('/login');
-      // return transporter.sendMail({
-      //   to: email,
-      //   from: 'shop@node-complete.com',
-      //   subject: 'Signup succeeded!',
-      //   html: '<h1>You successfully signed up!</h1>'
-      // });
     })
     .catch(err => {
       const error = new Error(err);
